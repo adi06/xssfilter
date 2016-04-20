@@ -1,5 +1,10 @@
 package asu.cs541.ss.xssfilter;
 
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -16,30 +21,45 @@ public class XSSValidator {
 	}
 
 	private static class XSSHttpRequestWrapper extends HttpServletRequestWrapper {
-		HttpServletRequest request;
+
+		private HttpServletRequest request;
+		private Map<String, String[]> modifiedRequestParamMap;  
 		
 		public XSSHttpRequestWrapper(HttpServletRequest request) {
 			super(request);
 			this.request= request;
+			this.modifiedRequestParamMap = new HashMap<String, String[]>();
 		}
 		
-		 @Override
-		    public String getParameter(String parameter) {
-			 String paramValue = request.getParameterValues(parameter)[0];
-			 String sanitizedParameter = paramValue;
-			 for(RequestParamValidator paramValidator : XSSDefenseRuleFactory.getRules()) {
-					sanitizedParameter = paramValidator.validate(sanitizedParameter);
-				}
-			 System.out.println("sanitizedParameter "+sanitizedParameter);
-		        return sanitizedParameter;
-		    }
-		 	
-		 	//TODO
 		    @Override
-		    public String getHeader(String name) {
-		        return null;
+		    public String getParameter(String name) {
+		 	String[] values = this.request.getParameterValues(name);
+		 	String sanitizedParameter = null ;
+			 for(int index=0; index < values.length; index++){
+				 for(RequestParamValidator paramValidator : XSSDefenseRuleFactory.getRules()) {
+					 sanitizedParameter = paramValidator.validate(values[index]);
+					 values[index] = sanitizedParameter;
+				 }		
+			 }
+			 modifiedRequestParamMap.put(name, values);
+			 return sanitizedParameter;
 		    }
-		    //TODO implementations
+		    
+		    @Override
+		    public Map<String, String[]> getParameterMap(){
+		    	return this.modifiedRequestParamMap;
+		    }
+		    
+		    @Override
+		    public String[] getParameterValues(String name) {
+		    	return this.modifiedRequestParamMap.get(name);
+		    }
+		    
+		    @Override
+		    public Enumeration<String> getParameterNames() {
+		    	return Collections.enumeration(this.modifiedRequestParamMap.keySet());
+		    }
+		    
 		    
 	}
 }
