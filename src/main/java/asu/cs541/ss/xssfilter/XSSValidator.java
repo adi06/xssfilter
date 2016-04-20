@@ -1,7 +1,5 @@
 package asu.cs541.ss.xssfilter;
 
-import java.util.Map;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -14,31 +12,25 @@ public class XSSValidator {
 	
 	public static ServletRequest doValidate(ServletRequest request) {
 		
-		/*if(request != null) {
-			for(Map.Entry<String, String[]> reqParamMap : request.getParameterMap().entrySet()) {
-				for(String param : reqParamMap.getValue()){
-					for(RequestParamValidator paramValidator : XSSDefenseRuleFactory.getRules()) {
-						paramValidator.validate(param);
-					}
-				}
-			}	
-		}*/
-		
 		return new XSSHttpRequestWrapper((HttpServletRequest)request);
 	}
 
 	private static class XSSHttpRequestWrapper extends HttpServletRequestWrapper {
+		HttpServletRequest request;
 		
 		public XSSHttpRequestWrapper(HttpServletRequest request) {
 			super(request);
+			this.request= request;
 		}
 		
 		 @Override
-		    public String getParameter(String parameter) {	
-			 String sanitizedParameter = parameter;
+		    public String getParameter(String parameter) {
+			 String paramValue = request.getParameterValues(parameter)[0];
+			 String sanitizedParameter = paramValue;
 			 for(RequestParamValidator paramValidator : XSSDefenseRuleFactory.getRules()) {
 					sanitizedParameter = paramValidator.validate(sanitizedParameter);
 				}
+			 System.out.println("sanitizedParameter "+sanitizedParameter);
 		        return sanitizedParameter;
 		    }
 		 	
