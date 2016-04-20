@@ -10,9 +10,9 @@ import asu.cs541.ss.xssfilter.rules.XSSDefenseRuleFactory;
 import asu.cs541.ss.xssfilter.validator.RequestParamValidator;
 
 
-public class XSSFilter {	
+public class XSSValidator {	
 	
-	public static ServletRequest doFilter(ServletRequest request) {
+	public static ServletRequest doValidate(ServletRequest request) {
 		
 		/*if(request != null) {
 			for(Map.Entry<String, String[]> reqParamMap : request.getParameterMap().entrySet()) {
