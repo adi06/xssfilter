@@ -4,6 +4,6 @@ import asu.cs541.ss.xssfilter.exception.InvalidRequestException;
 
 public interface RequestParamValidator {
 	
-	public void validate(String param) throws InvalidRequestException;
+	public String validate(String param) throws InvalidRequestException;
 
 }
