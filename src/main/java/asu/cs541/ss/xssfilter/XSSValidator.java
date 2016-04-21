@@ -8,6 +8,8 @@ import java.util.Map;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 import asu.cs541.ss.xssfilter.rules.XSSDefenseRuleFactory;
 import asu.cs541.ss.xssfilter.validator.RequestParamValidator;
@@ -61,5 +63,16 @@ public class XSSValidator {
 		    }
 		    
 		    
+	}
+	private static class XSSHttpResponseWrapper extends HttpServletResponseWrapper {
+		
+		private HttpServletResponse response;
+
+		public XSSHttpResponseWrapper(HttpServletResponse response) {
+			super(response);
+			this.response = response;
+		}
+		
+		
 	}
 }
