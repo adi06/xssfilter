@@ -1,8 +1,12 @@
 package asu.cs541.ss.xssfilter;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
@@ -12,6 +16,11 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import asu.cs541.ss.xssfilter.model.Rule;
 import asu.cs541.ss.xssfilter.rules.XSSDefenseRuleFactory;
 import asu.cs541.ss.xssfilter.validator.RequestParamValidator;
 
@@ -40,6 +49,23 @@ public class XSSValidator {
 	}
 	public void setFilterConfig(String filterConfig) {
 		this.filterConfig = filterConfig;
+		System.out.println("inside setFilterCofig with input data as:"+ filterConfig);
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			List<Rule> allRules = mapper.readValue(
+		    		filterConfig,
+		            mapper.getTypeFactory().constructCollectionType(
+		                    List.class, Rule.class));
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	
