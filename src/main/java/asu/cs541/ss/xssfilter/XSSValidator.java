@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
@@ -17,12 +18,32 @@ import asu.cs541.ss.xssfilter.validator.RequestParamValidator;
 
 public class XSSValidator {	
 	
-	public static ServletRequest doValidate(ServletRequest request) {
-		
-		return new XSSHttpRequestWrapper((HttpServletRequest)request);
+	private XSSHttpRequestWrapper requestWrapper;
+	
+	private XSSHttpResponseWrapper responseWrapper;
+	private String filterConfig;
+	
+	public XSSValidator(ServletRequest request, ServletResponse response) {
+		this.requestWrapper = new XSSHttpRequestWrapper((HttpServletRequest)request);
+		this.responseWrapper = new XSSHttpResponseWrapper((HttpServletResponse)response);
 	}
-
-	private static class XSSHttpRequestWrapper extends HttpServletRequestWrapper {
+	
+	public XSSHttpRequestWrapper getRequestWrapper() {
+		return requestWrapper;
+	}
+	public XSSHttpResponseWrapper getResponseWrapper() {
+		return responseWrapper;
+	}
+	
+	public String getFilterConfig() {
+		return filterConfig;
+	}
+	public void setFilterConfig(String filterConfig) {
+		this.filterConfig = filterConfig;
+	}
+	
+	
+	private class XSSHttpRequestWrapper extends HttpServletRequestWrapper {
 
 		private HttpServletRequest request;
 		private Map<String, String[]> modifiedRequestParamMap;  
@@ -37,7 +58,7 @@ public class XSSValidator {
 		    public String getParameter(String name) {
 		 	String[] values = this.request.getParameterValues(name);
 		 	String sanitizedParameter = null ;
-			 for(int index=0; index < values.length; index++){
+			 for(int index=0; index < values.length; index++){ // TODO : do only for rules mentioned in filterConfig
 				 for(RequestParamValidator paramValidator : XSSDefenseRuleFactory.getRules()) {
 					 sanitizedParameter = paramValidator.validate(values[index]);
 					 values[index] = sanitizedParameter;
@@ -64,7 +85,7 @@ public class XSSValidator {
 		    
 		    
 	}
-	private static class XSSHttpResponseWrapper extends HttpServletResponseWrapper {
+	private  class XSSHttpResponseWrapper extends HttpServletResponseWrapper {
 		
 		private HttpServletResponse response;
 
