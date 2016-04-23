@@ -1,22 +1,21 @@
 package asu.cs541.ss.xssfilter.rules;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
-import asu.cs541.ss.xssfilter.XSSValidator;
 import asu.cs541.ss.xssfilter.validator.RequestParamValidator;
 
 
 public class XSSDefenseRuleFactory {
 	
-	private static final List<RequestParamValidator> rules = new ArrayList<RequestParamValidator>();
+	private static final LinkedList<RequestParamValidator> rules = new LinkedList<RequestParamValidator>();
 	
-	//TODO add the other rules here..
-	static {
-		rules.add(new HtmlEscapeRule());
-	}
-	
-	public static List<RequestParamValidator> getRules(){
+	public static LinkedList<RequestParamValidator> getRules(){
 		return rules;
 	}
+	
+	public static void addRule(RequestParamValidator rule) {
+		if(!rules.contains(rule))
+			rules.addFirst(rule);
+	}
+
 }

@@ -13,25 +13,43 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import asu.cs541.ss.xssfilter.rules.CustomWhiteListRules;
+import asu.cs541.ss.xssfilter.rules.HtmlEscapeRule;
 import asu.cs541.ss.xssfilter.rules.XSSDefenseRuleFactory;
 import asu.cs541.ss.xssfilter.validator.RequestParamValidator;
 
 
-public final class XSSValidator {	
+public final class XSSFilter {	
 	
 	private XSSHttpRequestWrapper requestWrapper;	
 	private XSSHttpResponseWrapper responseWrapper;
 	private String filterConfig;
-	private static CustomWhiteListRules rule;
 	
-	public XSSValidator(ServletRequest request, ServletResponse response) {
+	public XSSFilter(ServletRequest request, ServletResponse response, String filterConfig){
+		this(request, response);
+		this.filterConfig = filterConfig;
+		
+		//Add custom white list to rule factory
+		//TODO as this is a one time rule shoud make it global
+		addRulesToFactory();
+	}
+	
+
+	public XSSFilter(ServletRequest request, ServletResponse response) {
 		this.requestWrapper = new XSSHttpRequestWrapper((HttpServletRequest)request);
 		this.responseWrapper = new XSSHttpResponseWrapper((HttpServletResponse)response);
 	}
 	
+	private void addRulesToFactory() {
+		if(filterConfig != null && !filterConfig.isEmpty())
+			XSSDefenseRuleFactory.addRule(new CustomWhiteListRules(filterConfig));
+		else {
+			XSSDefenseRuleFactory.addRule(new HtmlEscapeRule());
+		}
+	}
 	public XSSHttpRequestWrapper getRequestWrapper() {
 		return requestWrapper;
 	}
+	
 	public XSSHttpResponseWrapper getResponseWrapper() {
 		return responseWrapper;
 	}
@@ -39,17 +57,6 @@ public final class XSSValidator {
 	public String getFilterConfig() {
 		return filterConfig;
 	}
-	public void setFilterConfig(String filterConfig) {
-		this.filterConfig = filterConfig;
-	}
-	//TODO change this ...
-	public CustomWhiteListRules getRule() {
-		if(rule == null && filterConfig != null) {
-			rule = new CustomWhiteListRules(filterConfig);
-		}
-		return rule;
-	}
-	
 	
 	private class XSSHttpRequestWrapper extends HttpServletRequestWrapper {
 
@@ -59,13 +66,17 @@ public final class XSSValidator {
 		public XSSHttpRequestWrapper(HttpServletRequest request) {
 			super(request);
 			this.request= request;
+			//TODO clone existing request map 
 			this.modifiedRequestParamMap = new HashMap<String, String[]>();
 		}
 		
 		    @Override
 		    public String getParameter(String name) {
-		 	String[] values = this.request.getParameterValues(name);
+		 	String[] values = request.getParameterValues(name);
 		 	String sanitizedParameter = null ;
+		 	if(filterConfig != null){
+		 		
+		 	}
 			 for(int index=0; index < values.length; index++){ // TODO : do only for rules mentioned in filterConfig
 				 for(RequestParamValidator paramValidator : XSSDefenseRuleFactory.getRules()) {
 					 sanitizedParameter = paramValidator.validate(values[index]);
@@ -91,9 +102,8 @@ public final class XSSValidator {
 		    public Enumeration<String> getParameterNames() {
 		    	return Collections.enumeration(this.modifiedRequestParamMap.keySet());
 		    }
-		    
-		    
 	}
+	
 	private  class XSSHttpResponseWrapper extends HttpServletResponseWrapper {
 		
 		private HttpServletResponse response;
