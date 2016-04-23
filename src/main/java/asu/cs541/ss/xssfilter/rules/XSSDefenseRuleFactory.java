@@ -3,6 +3,7 @@ package asu.cs541.ss.xssfilter.rules;
 import java.util.ArrayList;
 import java.util.List;
 
+import asu.cs541.ss.xssfilter.XSSValidator;
 import asu.cs541.ss.xssfilter.validator.RequestParamValidator;
 
 

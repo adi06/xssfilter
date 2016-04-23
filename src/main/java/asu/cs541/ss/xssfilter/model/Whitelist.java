@@ -7,32 +7,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "name", "allow" })
-public class Whitelist {
+@JsonPropertyOrder({ "rule" })
+public class WhiteList {
 
-	@JsonProperty("name")
-	private String name;
-	@JsonProperty("allow")
-	private List<String> allow = new ArrayList<String>();
+	@JsonProperty("rule")
+	private List<Rule> rule = new ArrayList<Rule>();
 
-	@JsonProperty("name")
-	public String getName() {
-		return name;
+	@JsonProperty("rule")
+	public List<Rule> getRule() {
+		return rule;
 	}
 
-	@JsonProperty("name")
-	public void setName(String name) {
-		this.name = name;
+	@JsonProperty("rule")
+	public void setRule(List<Rule> rule) {
+		this.rule = rule;
 	}
-
-	@JsonProperty("allow")
-	public List<String> getAllow() {
-		return allow;
-	}
-
-	@JsonProperty("allow")
-	public void setAllow(List<String> allow) {
-		this.allow = allow;
-	}
-
 }

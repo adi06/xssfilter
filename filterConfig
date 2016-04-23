@@ -1,0 +1,14 @@
+  {
+  		"rule" : [
+          			{ 	
+            			 "name" : "Escape",
+                      	 "allowed" : true,
+    	        		 "tags" : [
+          							{
+          								"name" : "div",
+          								"allowed": ["attr","onmouseover"]  
+        		 					}
+        		 				 ]
+                    }
+				]
+  }

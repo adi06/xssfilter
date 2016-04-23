@@ -7,15 +7,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "name", "allowed", "tags" })
-public class Rule {
+@JsonPropertyOrder({ "name", "allowed" })
+public class Tag {
 
 	@JsonProperty("name")
 	private String name;
 	@JsonProperty("allowed")
-	private Boolean allowed;
-	@JsonProperty("tags")
-	private List<Tag> tags = new ArrayList<Tag>();
+	private List<String> allowed = new ArrayList<String>();
 
 	@JsonProperty("name")
 	public String getName() {
@@ -28,30 +26,21 @@ public class Rule {
 	}
 
 	@JsonProperty("allowed")
-	public Boolean getAllowed() {
+	public List<String> getAllowed() {
 		return allowed;
 	}
 
 	@JsonProperty("allowed")
-	public void setAllowed(Boolean allowed) {
+	public void setAllowed(List<String> allowed) {
 		this.allowed = allowed;
 	}
-
-	@JsonProperty("tags")
-	public List<Tag> getTags() {
-		return tags;
-	}
-
-	@JsonProperty("tags")
-	public void setTags(List<Tag> tags) {
-		this.tags = tags;
-	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("name: ").append(name)
-		  .append(",tags: ").append(tags);
+		  .append(",allowed: ").append(allowed);
 		return sb.toString();
 	}
+
 }

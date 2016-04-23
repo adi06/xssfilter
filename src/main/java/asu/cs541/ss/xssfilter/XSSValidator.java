@@ -1,10 +1,8 @@
 package asu.cs541.ss.xssfilter;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
@@ -14,21 +12,17 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import asu.cs541.ss.xssfilter.model.Rule;
+import asu.cs541.ss.xssfilter.rules.CustomWhiteListRules;
 import asu.cs541.ss.xssfilter.rules.XSSDefenseRuleFactory;
 import asu.cs541.ss.xssfilter.validator.RequestParamValidator;
 
 
-public class XSSValidator {	
+public final class XSSValidator {	
 	
-	private XSSHttpRequestWrapper requestWrapper;
-	
+	private XSSHttpRequestWrapper requestWrapper;	
 	private XSSHttpResponseWrapper responseWrapper;
 	private String filterConfig;
+	private static CustomWhiteListRules rule;
 	
 	public XSSValidator(ServletRequest request, ServletResponse response) {
 		this.requestWrapper = new XSSHttpRequestWrapper((HttpServletRequest)request);
@@ -47,30 +41,20 @@ public class XSSValidator {
 	}
 	public void setFilterConfig(String filterConfig) {
 		this.filterConfig = filterConfig;
-		System.out.println("inside setFilterCofig with input data as:"+ filterConfig);
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			List<Rule> allRules = mapper.readValue(
-		    		filterConfig,
-		            mapper.getTypeFactory().constructCollectionType(
-		                    List.class, Rule.class));
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	}
+	//TODO change this ...
+	public CustomWhiteListRules getRule() {
+		if(rule == null && filterConfig != null) {
+			rule = new CustomWhiteListRules(filterConfig);
 		}
+		return rule;
 	}
 	
 	
 	private class XSSHttpRequestWrapper extends HttpServletRequestWrapper {
 
 		private HttpServletRequest request;
-		private Map<String, String[]> modifiedRequestParamMap;  
+		private Map<String, String[]> modifiedRequestParamMap;
 		
 		public XSSHttpRequestWrapper(HttpServletRequest request) {
 			super(request);
@@ -86,7 +70,8 @@ public class XSSValidator {
 				 for(RequestParamValidator paramValidator : XSSDefenseRuleFactory.getRules()) {
 					 sanitizedParameter = paramValidator.validate(values[index]);
 					 values[index] = sanitizedParameter;
-				 }		
+				 }	
+				 
 			 }
 			 modifiedRequestParamMap.put(name, values);
 			 return sanitizedParameter;
