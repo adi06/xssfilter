@@ -1,7 +1,5 @@
 package asu.cs541.ss.xssfilter;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
