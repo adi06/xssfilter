@@ -31,30 +31,35 @@ public class CustomWhiteListRules implements RequestParamValidator {
 	}
 
 	public String validate(String param) throws InvalidRequestException {
-		if(whiteList.getRule() != null && !whiteList.getRule().isEmpty())
-			System.out.println(whiteList.getRule());
-		for(Rule rule : whiteList.getRule()){
-			List<String> regexMatch = new ArrayList<String>();
-			StringBuffer regex = new StringBuffer();
-			for(Tag tag : rule.getTags()) {
-				String name = tag.getName();
-				for(String tags : tag.getAllowed()){
-					//sample input <SCRIPT SRC=link/>
-					regex.append("[^")
-						 .append("<"+name)
-						 .append(tags+"=>")
-						 .append("]")
-						 .append("+");
-					
-					Pattern pattern = Pattern.compile(regex.toString());
-					Matcher match = pattern.matcher(param);
-					while(match.find()){
-						regexMatch.add(match.group());
+		if(whiteList.getRule() != null && !whiteList.getRule().isEmpty()) {
+			for(Rule rule : whiteList.getRule()){
+				List<String> regexMatch = new ArrayList<String>();
+				StringBuffer regex = new StringBuffer();
+				for(Tag tag : rule.getTags()) {
+					String name = tag.getName();
+					for(String tags : tag.getAllowed()){
+						//sample input <SCRIPT SRC=link/>
+						regex.append("[^")
+						.append("<"+name)
+						.append(tags+"=>")
+						.append("]+");
+						
+						Pattern pattern = Pattern.compile(regex.toString());
+						Matcher match = pattern.matcher(param);
+						while(match.find()){
+							regexMatch.add(match.group());
+						}
+						for(String token : regexMatch) {
+							if(token !=null && !token.isEmpty()){
+								
+							}
+						}
+						System.out.println(regexMatch);
 					}
-					System.out.println(regexMatch);
 				}
 			}
 		}
+			System.out.println(whiteList.getRule());
 		//TODO apply rules to the param
 		return param;
 	}

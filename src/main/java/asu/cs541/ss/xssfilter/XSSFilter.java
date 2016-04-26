@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import asu.cs541.ss.xssfilter.rules.BlackListRule;
 import asu.cs541.ss.xssfilter.rules.CustomWhiteListRules;
 import asu.cs541.ss.xssfilter.rules.HtmlEscapeRule;
 import asu.cs541.ss.xssfilter.rules.XSSDefenseRuleFactory;
@@ -43,7 +44,8 @@ public final class XSSFilter {
 		if(filterConfig != null && !filterConfig.isEmpty())
 			XSSDefenseRuleFactory.addRule(new CustomWhiteListRules(filterConfig));
 		else {
-			XSSDefenseRuleFactory.addRule(new HtmlEscapeRule());
+			XSSDefenseRuleFactory.addRule(new BlackListRule());
+			//XSSDefenseRuleFactory.addRule(new HtmlEscapeRule());
 		}
 	}
 	public XSSHttpRequestWrapper getRequestWrapper() {
