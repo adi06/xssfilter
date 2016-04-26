@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -12,9 +13,9 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import asu.cs541.ss.xssfilter.exception.InvalidParameterException;
 import asu.cs541.ss.xssfilter.rules.BlackListRule;
 import asu.cs541.ss.xssfilter.rules.CustomWhiteListRules;
-import asu.cs541.ss.xssfilter.rules.HtmlEscapeRule;
 import asu.cs541.ss.xssfilter.rules.XSSDefenseRuleFactory;
 import asu.cs541.ss.xssfilter.validator.RequestParamValidator;
 
@@ -24,8 +25,9 @@ public final class XSSFilter {
 	private XSSHttpRequestWrapper requestWrapper;	
 	private XSSHttpResponseWrapper responseWrapper;
 	private String filterConfig;
+	private static final ConcurrentHashMap<XSSHttpResponseWrapper, XSSHttpRequestWrapper> reqResMap = new ConcurrentHashMap<XSSHttpResponseWrapper, XSSHttpRequestWrapper>();
 	
-	public XSSFilter(ServletRequest request, ServletResponse response, String filterConfig){
+	public XSSFilter(ServletRequest request, ServletResponse response, String filterConfig)throws InvalidParameterException{
 		this(request, response);
 		this.filterConfig = filterConfig;
 		
@@ -38,6 +40,7 @@ public final class XSSFilter {
 	public XSSFilter(ServletRequest request, ServletResponse response) {
 		this.requestWrapper = new XSSHttpRequestWrapper((HttpServletRequest)request);
 		this.responseWrapper = new XSSHttpResponseWrapper((HttpServletResponse)response);
+		reqResMap.put(responseWrapper, requestWrapper);
 	}
 	
 	private void addRulesToFactory() {

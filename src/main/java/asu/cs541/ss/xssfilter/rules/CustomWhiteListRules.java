@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import asu.cs541.ss.xssfilter.exception.InvalidRequestException;
+import asu.cs541.ss.xssfilter.exception.InvalidParameterException;
 import asu.cs541.ss.xssfilter.model.Rule;
 import asu.cs541.ss.xssfilter.model.Tag;
 import asu.cs541.ss.xssfilter.model.WhiteList;
@@ -30,7 +30,7 @@ public class CustomWhiteListRules implements RequestParamValidator {
 		}
 	}
 
-	public String validate(String param) throws InvalidRequestException {
+	public String validate(String param) throws InvalidParameterException {
 		if(whiteList.getRule() != null && !whiteList.getRule().isEmpty()) {
 			for(Rule rule : whiteList.getRule()){
 				List<String> regexMatch = new ArrayList<String>();

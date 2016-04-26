@@ -1,16 +1,16 @@
 package asu.cs541.ss.xssfilter.exception;
 
-public class InvalidRequestException extends RuntimeException {
+public class InvalidParameterException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 	private int errorCode;
 
-	public InvalidRequestException(String message, int errorCode) {
+	public InvalidParameterException(String message, int errorCode) {
 		super(message);
 		this.setErrorCode(errorCode);
 	}
 	
-	public InvalidRequestException(String message, int errCode, Throwable th) {
+	public InvalidParameterException(String message, int errCode, Throwable th) {
 		super(message,th);
 		this.setErrorCode(errCode);
 	}
