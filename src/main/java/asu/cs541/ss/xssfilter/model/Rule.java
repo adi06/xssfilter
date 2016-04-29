@@ -14,6 +14,8 @@ public class Rule {
 	private String name;
 	@JsonProperty("allowed")
 	private Boolean allowed;
+	@JsonProperty("onFiles")
+	private Boolean onFiles;
 	@JsonProperty("tags")
 	private List<Tag> tags = new ArrayList<Tag>();
 
@@ -45,6 +47,14 @@ public class Rule {
 	@JsonProperty("tags")
 	public void setTags(List<Tag> tags) {
 		this.tags = tags;
+	}
+	
+	public Boolean getOnFiles() {
+		return onFiles;
+	}
+
+	public void setOnFiles(Boolean onFiles) {
+		this.onFiles = onFiles;
 	}
 
 	@Override

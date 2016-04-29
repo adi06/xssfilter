@@ -1,8 +1,16 @@
 package asu.cs541.ss.xssfilter;
 
+import java.io.BufferedReader;
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,7 +33,7 @@ public final class XSSFilter {
 	private XSSHttpRequestWrapper requestWrapper;	
 	private XSSHttpResponseWrapper responseWrapper;
 	private String filterConfig;
-	private static final ConcurrentHashMap<XSSHttpResponseWrapper, XSSHttpRequestWrapper> reqResMap = new ConcurrentHashMap<XSSHttpResponseWrapper, XSSHttpRequestWrapper>();
+	private static final ConcurrentHashMap<ServletRequest, ServletResponse> reqResMap = new ConcurrentHashMap<ServletRequest, ServletResponse>();
 	
 	public XSSFilter(ServletRequest request, ServletResponse response, String filterConfig)throws InvalidParameterException{
 		this(request, response);
@@ -35,17 +43,40 @@ public final class XSSFilter {
 		//TODO as this is a one time rule shoud make it global
 		addRulesToFactory();
 	}
-	
+	public XSSHttpResponseWrapper XSSFilterOnResponse(ServletRequest request,XSSHttpResponseWrapper response){
+		//reqResMap.get(response);
+		HttpServletRequest inputRequest = (HttpServletRequest) request;
+		String reqMethod = inputRequest.getMethod();
+//		PrintWriter writer;
+//		try {
+//			writer = response.getWriter();
+//			writer.write("<html><body>GET/POST response</body></html>");
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		//HttpServletResponse outputResponse = (HttpServletResponse)response;
+		System.out.println("in XSSFilterOnResponse");
+		int resStatus = response.getStatus();
+		System.out.println("res:"+resStatus);
+		Collection<String> headerNames = response.getHeaderNames();
+		for (String headerName : headerNames) {
+			Collection<String> values = response.getHeaders(headerName);
+			System.out.println("header :"+ headerName + "  value:"+ values);
+		}
+		//outputResponse.
+		return null;
+	}
 
 	public XSSFilter(ServletRequest request, ServletResponse response) {
 		this.requestWrapper = new XSSHttpRequestWrapper((HttpServletRequest)request);
 		this.responseWrapper = new XSSHttpResponseWrapper((HttpServletResponse)response);
-		reqResMap.put(responseWrapper, requestWrapper);
+		reqResMap.put(request, response);
 	}
 	
 	private void addRulesToFactory() {
 		if(filterConfig != null && !filterConfig.isEmpty())
-			XSSDefenseRuleFactory.addRule(new CustomWhiteListRules(filterConfig));
+			XSSDefenseRuleFactory.addRule(new BlackListRule(new CustomWhiteListRules(filterConfig)));
 		else {
 			XSSDefenseRuleFactory.addRule(new BlackListRule());
 			//XSSDefenseRuleFactory.addRule(new HtmlEscapeRule());
@@ -56,6 +87,7 @@ public final class XSSFilter {
 	}
 	
 	public XSSHttpResponseWrapper getResponseWrapper() {
+		System.out.println("inside response wrapper");
 		return responseWrapper;
 	}
 	
@@ -109,14 +141,25 @@ public final class XSSFilter {
 		    }
 	}
 	
-	private  class XSSHttpResponseWrapper extends HttpServletResponseWrapper {
+	public  class XSSHttpResponseWrapper extends HttpServletResponseWrapper {
 		
 		private HttpServletResponse response;
-
+		 private CharArrayWriter output;
+		 public String toString() {
+		        return output.toString();
+		    }
 		public XSSHttpResponseWrapper(HttpServletResponse response) {
 			super(response);
 			this.response = response;
+			output = new CharArrayWriter();
+			System.out.println("in response wrapper");
 		}
+		
+		public PrintWriter getWriter() {
+			
+			System.out.println("in getwriter");
+	        return new PrintWriter(output);
+	    }
 		
 		
 	}
