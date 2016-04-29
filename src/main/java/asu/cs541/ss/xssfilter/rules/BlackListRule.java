@@ -1,30 +1,23 @@
 package asu.cs541.ss.xssfilter.rules;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Element;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import asu.cs541.ss.xssfilter.exception.InvalidParameterException;
 import asu.cs541.ss.xssfilter.model.Rule;
 import asu.cs541.ss.xssfilter.model.Tag;
-import asu.cs541.ss.xssfilter.model.WhiteList;
 import asu.cs541.ss.xssfilter.util.EscapeUtils;
 import asu.cs541.ss.xssfilter.validator.RequestParamValidator;
+
 /*
  * Credits https://gist.github.com/madoke/2347047 
  */
@@ -40,7 +33,7 @@ public class BlackListRule implements RequestParamValidator{
 			Pattern.compile("expression\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
 			Pattern.compile("javascript", Pattern.CASE_INSENSITIVE),
 			Pattern.compile("onload(.*?)=", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
-			Pattern.compile("[img]+")
+			Pattern.compile("<img>(.*?)</img>", Pattern.CASE_INSENSITIVE)
 	};
 	
 	public BlackListRule() {
@@ -59,7 +52,6 @@ public class BlackListRule implements RequestParamValidator{
 		if(customWhiteListRules == null) {
 			for(Pattern pattern : paramPattern){		
 				if(pattern.matcher(param).matches()){
-					//throw new InvalidParameterException("Invalid paramter: "+param, 400);
 					return EscapeUtils.escapeHtml(param);
 				}
 			}
